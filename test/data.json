@@ -1,0 +1,13 @@
+{
+    "tplData": {
+        "baseDir": "./basedir",
+        "hash": {
+            "a": "aaaa",
+            "b": "bbbb"
+        },
+        "list": [
+            "aaaa",
+            "bbbb"
+        ]
+    }
+}
