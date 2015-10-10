@@ -3,22 +3,6 @@
  * @author mengke01(kekee000@gmail.com)
  */
 
-/**
- * 构造smarty模板异常
- *
- * @param  {string} desc   异常内容
- * @param  {string} template 模板字符串
- * @param  {string} index   发生错误索引
- * @return {Error}
- */
-function throwError(desc, template, index) {
-    var lines = template.slice(0, index).split('\n');
-    var description = 'SMARTY:' + desc
-        + '\nAT: line ' + lines.length
-        + '\n' + lines.pop();
-    return new Error(description);
-}
-
 
 /**
  * 移除模板注释，同时转换换行符
