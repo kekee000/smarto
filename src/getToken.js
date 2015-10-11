@@ -19,7 +19,8 @@ var smartyBlocks = {
     'literal': 1,
     'php': 1,
     'section': 1,
-    'while': 1
+    'while': 1,
+    'strip': 1
 };
 
 /**
@@ -65,7 +66,7 @@ function getToken(template, options) {
                 }
                 command.type = TOKEN_BLOCK;
                 command.tag = tag;
-                command.close = true;
+                command.isClose = true;
             }
             // block开始
             else if (match = command.text.match(/^\w+\s/)) {
@@ -75,13 +76,16 @@ function getToken(template, options) {
                     command.text = command.text.slice(tag.length);
                 }
             }
+            else {
+                command.type = TOKEN_FUNC;
+            }
 
             segments.push(command);
 
             lastIndex = rIndex + rdelim.length;
         }
         else {
-            throw throwError('unclosed comment', template, index + ldelim.length);
+            throw throwError('unclosed command', template, index + ldelim.length);
         }
     }
 
@@ -91,12 +95,68 @@ function getToken(template, options) {
         to: index
     });
 
-    var tree = [];
-    getTree(segments, tree);
-    console.log(template);
+    return getTree(template, segments, options);
 }
 
+var STATUS_STRIP = false; // 是否strip状态
 
-function getTree() {
+function getCloseCommandIndex(tagName, segments, index) {
+    var openCount = 0;
+    for (var i = index, l = segments.length; i < l; i++) {
+        if (segments[i].tag === tagName) {
+            if (segments[i].isClose) {
+                if (openCount) {
+                    openCount--;
+                }
+                else {
+                    return i;
+                }
+            }
+            else {
+                openCount++;
+            }
+        }
+    }
 
+    throw throwError('unclosed command' + tagName);
+}
+
+/**
+ * 根据模板获取token列表
+ * @param  {string} template 模板
+ * @param  {Object} options  模板参数
+ * @return {Array}          token数组
+ */
+function getTree(template, segments, options) {
+    var tree = [];
+
+    for (var i = 0; i < segments.length; i++) {
+        var command = segments[i];
+        if (command.type === TOKEN_TEXT) {
+            command.text =  template.slice(command.from, command.to);
+            // strip状态需要去除空格
+            if (STATUS_STRIP) {
+                command.text = trim(command.text);
+            }
+            tree.push(command);
+        }
+        else if (command.type === TOKEN_VAR) {
+            parseVar(template, command);
+        }
+        else if (command.type === TOKEN_BLOCK) {
+            var closeCommandIndex = getCloseCommandIndex(command.tag, segments, i + 1);
+            if (command.tag === 'literal') {
+                command.type = TOKEN_TEXT;
+                command.from = command.to;
+                command.to = segments[closeCommandIndex].from;
+                command.text =  template.slice(command.from, command.to);
+                tree.push(command);
+                i = closeCommandIndex;
+            }
+            else {
+                parseBlock(template, command);
+            }
+        }
+    }
+    return tree;
 }
