@@ -23,8 +23,9 @@ function generic(method) {
  * @param  {string} index   发生错误索引
  * @return {Error}
  */
-function throwError(desc, template, index) {
-    var lines = template.slice(0, index).split('\n');
+function throwError(desc, index, template) {
+    template = template || currentTemplate;
+    var lines = template ? template.slice(0, index).split('\n') : [];
     var description = 'SMARTY:' + desc
         + '\nAT: line ' + lines.length
         + '\n' + lines.pop();
@@ -43,3 +44,12 @@ var each = Array.prototype.forEach ? generic(Array.prototype.forEach): function 
     }
 };
 
+
+var strip = function (s) {
+    return String(s).replace(/\s+/g, ' ');
+};
+
+
+
+
+var currentTemplate = null;

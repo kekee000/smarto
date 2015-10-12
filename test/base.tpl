@@ -1,11 +1,16 @@
 {$tplData.baseDir}
 
+{strip}
+strip
+
 {*移除注释*}
 {*
     移除多行
     注释
 *}
 
+strip
+{/strip}
 
 {$tplData.hash = [
     'a' => 'aaaa',

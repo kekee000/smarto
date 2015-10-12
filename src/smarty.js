@@ -54,7 +54,6 @@ function Smarty(options) {
     this.left_delimiter = options.left_delimiter || '{';
     this.right_delimiter = options.right_delimiter || '}';
     this.template_dir = options.template_dir || '.';
-    this.data = {};
     this.filters = {};
     this.modifiers = {};
 }
@@ -78,7 +77,7 @@ Smarty.prototype.getTemplateVars = function () {
 };
 
 
-Smarty.prototype.fetch = function (path) {
+Smarty.prototype.fetch = function (data) {
     internal.curTemplate = path;
     return this.fetchTemplate(path);
 };
