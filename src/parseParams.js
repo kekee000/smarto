@@ -285,6 +285,28 @@ var tokens = [
 function parseParams(text) {
     text = trim(text.replace(/\n/g, ' '));
     var params = {};
+    var key;
+    var value;
+    var m;
+    while(m = text.match(/^(\w+)\s*/)) {
+        key = trim(m[1]);
+        text = text.slice(m[0].length);
+        if (text.charAt(0) === '=') {
+            text = text.slice(1);
+            if (m = text.match(/^(true|false|-\d+(?:\.\d+)?)\s*/)) {
+                value = m[1];
+                text = text.slice(m[0].length)
+            }
+            else if (m = text.match(/^('|")([^"'\\]*(?:\\.[^'"\\]*)*)\1\s*/)) {
+                value = decodeString(m[2]);
+                text = text.slice(m[0].length)
+            }
+            else {
+                throw throwError('no valid params ' + text);
+            }
+        }
+        params[key] = value || true;
+    }
 
-
+    return params;
 }

@@ -49,7 +49,14 @@ var strip = function (s) {
     return String(s).replace(/\s+/g, ' ');
 };
 
+var decodeString = function (s) {
+    return s.replace(/\\t/,'\t').replace(/\\n/,'\n').replace(/\\(['"\\])/g,'$1');
+};
 
+var trimQuotes = function (s) {
+    s = trim(s);
+    return decodeString(s.slice(1, -1));
+}
 
 
 var currentTemplate = null;
